@@ -20,8 +20,6 @@
 ;;; Code:
 
 
-(load "/mnt/localdisk/__tifr/faltu/lisp/matrix.el")
-(load "/mnt/localdisk/__tifr/faltu/lisp/debug.el")
 
 (setq camera-dist 5.0)
 

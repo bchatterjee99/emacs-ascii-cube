@@ -19,6 +19,9 @@
 ;;
 ;;; Code:
 
+(setq tileset ".;*O0@##")
+(load "/mnt/localdisk/__tifr/faltu/lisp/debug.el")
+(load "/mnt/localdisk/__tifr/faltu/lisp/matrix.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/triangle.el")
 
 (setq size 10.0)
@@ -63,13 +66,7 @@
                                  (- size) (- size) (+ shift size)
                                  (- size) (+ size) (+ shift size))))
 
-;; (setq cube (list  T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 T11 T12))
-(setq cube (list  T1 T2))
 
-(setq half-screen-width 10)
-(setq half-screen-height 10)
-
-(setq tileset ".;*O0@##")
 
 (defun object-translate (object shift)
   (dolist (triangle object)
@@ -78,7 +75,6 @@
       (aset vertex 1 (+ (aref vertex 1) (aref shift 1)))
       (aset vertex 2 (+ (aref vertex 2) (aref shift 2)))
       )))
-
 
 (setq theta 2)
 (setq Rx (matrix-create (list 1 0 0
@@ -93,13 +89,34 @@
                               (sin theta) (cos theta) 0
                               0 0 1)
                         3 3))
+(setq scale2 (matrix-create (list 2 0 0
+                                  0 2 0
+                                  0 0 2)
+                            3 3))
+(setq scale3 (matrix-create (list 3 0 0
+                                  0 3 0
+                                  0 0 3)
+                            3 3))
 
 (defun object-rotate (object)
+  ;; (object-translate object (matrix-create (list 0 0 (- shift))))
   (dolist (triangle object)
-    (debug-triangle triangle))
+    (dolist (vertex triangle)
+      (setq tmp (matrix-mult scale2 vertex 3 3 3 1))
+      (setq tmp (matrix-mult scale3 tmp 3 3 3 1))
+      (aset vertex 0 (aref tmp 0))
+      (aset vertex 1 (aref tmp 1))
+      (aset vertex 2 (aref tmp 2))))
+  ;; (object-translate object (matrix-create (list 0 0 shift)))
   )
 
+;; (setq cube (list  T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 T11 T12))
+(setq cube (list  T1 T2))
+;; (object-rotate cube)
 
+
+(setq half-screen-width 10)
+(setq half-screen-height 10)
 (defun draw-frame (object)
   (with-current-buffer "cube"
     (erase-buffer)
@@ -129,8 +146,7 @@
 ;; (map! :n "q" 'draw)
 
 
-(draw-frame cube)
-(object-rotate cube)
+;; (draw-frame cube)
 
 (provide 'cube)
 ;;; cube.el ends here

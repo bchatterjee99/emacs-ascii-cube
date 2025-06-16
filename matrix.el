@@ -49,7 +49,9 @@ C)
     (setq i (1+ i)))
   M)
 
-(matrix-create '(0 0 0 0) 2 2)
+;; TESTING GROUNDS -------------------------------------------------------
+
+;; (matrix-create '(0 0 0 0) 2 2)
 
 (provide 'matrix)
 ;;; matrix.el ends here

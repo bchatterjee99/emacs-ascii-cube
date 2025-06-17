@@ -21,7 +21,7 @@
 
 
 
-(setq camera-dist 5.0)
+(setq camera-dist 50.0)
 
 (defun  triangle-project (T)
   (let (ans)
@@ -105,8 +105,7 @@
             (abs (dot-product camera-dir (triangle-normal T)))))
   )
 
-
-(defun triangle-inside (T px py)
+(defun triangle-inside-div (T px py)
   (setq centr (triangle-centroid T))
   (setq cx (aref centr 0))
   (setq cy (aref centr 1))
@@ -134,6 +133,39 @@
                  (/ (- cy y3) (- y1 y3)))
               (- (/ (- px x3) (- x1 x3))
                  (/ (- py y3) (- y1 y3)))
+              ))
+       )
+  )
+
+
+(defun triangle-inside (T px py)
+  (setq centr (triangle-centroid T))
+  (setq cx (aref centr 0))
+  (setq cy (aref centr 1))
+  (setq x1 (aref (nth 0 T) 0))
+  (setq y1 (aref (nth 0 T) 1))
+  (setq x2 (aref (nth 1 T) 0))
+  (setq y2 (aref (nth 1 T) 1))
+  (setq x3 (aref (nth 2 T) 0))
+  (setq y3 (aref (nth 2 T) 1))
+  (and
+   (< 0 (*
+              (- (* (- cx x1) (- y2 y1))
+                 (* (- cy y1) (- x2 x1)))
+              (- (* (- px x1) (- y2 y1))
+                 (* (- py y1) (- x2 x1)))
+              ))
+   (< 0 (*
+              (- (* (- cx x2) (- y3 y2))
+                 (* (- cy y2) (- x3 x2)))
+              (- (* (- px x2) (- y3 y2))
+                 (* (- py y2) (- x3 x2)))
+              ))
+   (< 0 (*
+              (- (* (- cx x3) (- y1 y3))
+                 (* (- cy y3) (- x1 x3)))
+              (- (* (- px x3) (- y1 y3))
+                 (* (- py y3) (- x1 x3)))
               ))
        )
   )

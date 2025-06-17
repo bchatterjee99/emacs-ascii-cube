@@ -19,13 +19,14 @@
 ;;
 ;;; Code:
 
-(setq tileset ".;*O0@##")
+(setq tileset ".:o@##")
 (load "/mnt/localdisk/__tifr/faltu/lisp/debug.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/matrix.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/triangle.el")
 
+;; half of size of cube side
 (setq size 10.0)
-(setq shift 5.0)
+(setq shift 20.0)
 
 (setq T1 (triangle-create (list (- size) (- size) (+ shift)
                                 (- size) (+ size) (+ shift)
@@ -34,37 +35,37 @@
                                 (+ size) (- size) (+ shift)
                                 (+ size) (+ size) (+ shift))))
 (setq T3 (triangle-create (list (- size) (+ size) (+ shift)
-                                (- size) (+ size) (+ shift size)
-                                (+ size) (+ size) (+ shift size))))
+                                (- size) (+ size) (+ shift size size)
+                                (+ size) (+ size) (+ shift size size))))
 (setq T4 (triangle-create (list (- size) (+ size) (+ shift)
                                 (+ size) (+ size) (+ shift)
-                                (+ size) (+ size) (+ shift size))))
+                                (+ size) (+ size) (+ shift size size))))
 (setq T5 (triangle-create (list (+ size) (- size) (+ shift)
                                 (+ size) (+ size) (+ shift)
-                                (+ size) (+ size) (+ shift size))))
+                                (+ size) (+ size) (+ shift size size))))
 (setq T6 (triangle-create (list (+ size) (- size) (+ shift)
-                                (+ size) (- size) (+ shift size)
-                                (+ size) (+ size) (+ shift size))))
+                                (+ size) (- size) (+ shift size size)
+                                (+ size) (+ size) (+ shift size size))))
 
 
-(setq T7 (triangle-create (list (- size) (- size) (+ shift size)
-                                (- size) (+ size) (+ shift size)
-                                (+ size) (+ size) (+ shift size))))
-(setq T8 (triangle-create (list (- size) (- size) (+ shift size)
-                                (+ size) (- size) (+ shift size)
-                                (+ size) (+ size) (+ shift size))))
+(setq T7 (triangle-create (list (- size) (- size) (+ shift size size)
+                                (- size) (+ size) (+ shift size size)
+                                (+ size) (+ size) (+ shift size size))))
+(setq T8 (triangle-create (list (- size) (- size) (+ shift size size)
+                                (+ size) (- size) (+ shift size size)
+                                (+ size) (+ size) (+ shift size size))))
 (setq T9 (triangle-create (list (- size) (- size) (+ shift)
-                                (- size) (- size) (+ shift size)
-                                (+ size) (- size) (+ shift size))))
+                                (- size) (- size) (+ shift size size)
+                                (+ size) (- size) (+ shift size size))))
 (setq T10 (triangle-create (list (- size) (- size) (+ shift)
                                  (+ size) (- size) (+ shift)
-                                 (+ size) (- size) (+ shift size))))
+                                 (+ size) (- size) (+ shift size size))))
 (setq T11 (triangle-create (list (- size) (- size) (+ shift)
                                  (- size) (+ size) (+ shift)
-                                 (- size) (+ size) (+ shift size))))
+                                 (- size) (+ size) (+ shift size size))))
 (setq T12 (triangle-create (list (- size) (- size) (+ shift)
-                                 (- size) (- size) (+ shift size)
-                                 (- size) (+ size) (+ shift size))))
+                                 (- size) (- size) (+ shift size size)
+                                 (- size) (+ size) (+ shift size size))))
 
 
 
@@ -76,7 +77,7 @@
       (aset vertex 2 (+ (aref vertex 2) (aref shift 2)))
       )))
 
-(setq theta 2)
+(setq theta 0.2)
 (setq Rx (matrix-create (list 1 0 0
                               0 (cos theta) (- (sin theta))
                               0 (sin theta) (cos theta))
@@ -98,44 +99,65 @@
                                   0 0 3)
                             3 3))
 
+
 (defun object-rotate (object)
-  ;; (object-translate object (matrix-create (list 0 0 (- shift))))
+  (object-translate object (matrix-create (list 0 0 (- 0 shift size)) 1 3))
   (dolist (triangle object)
     (dolist (vertex triangle)
-      (setq tmp (matrix-mult scale2 vertex 3 3 3 1))
-      (setq tmp (matrix-mult scale3 tmp 3 3 3 1))
+      (setq tmp vertex)
+      (setq tmp (matrix-mult Rz tmp 3 3 3 1))
+      (setq tmp (matrix-mult Rx tmp 3 3 3 1))
       (aset vertex 0 (aref tmp 0))
       (aset vertex 1 (aref tmp 1))
       (aset vertex 2 (aref tmp 2))))
-  ;; (object-translate object (matrix-create (list 0 0 shift)))
+  (object-translate object (matrix-create (list 0 0 (+ shift size)) 1 3))
   )
 
-;; (setq cube (list  T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 T11 T12))
-(setq cube (list  T1 T2))
+(setq cube (list  T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 T11 T12))
+;; (setq cube (list  T1 T2))
 ;; (object-rotate cube)
 
 
 (setq half-screen-width 10)
 (setq half-screen-height 10)
+
 (defun draw-frame (object)
   (with-current-buffer "cube"
     (erase-buffer)
       (dotimes (i (* 2 half-screen-width))
         (dotimes (j (* 2 half-screen-width))
+          (setq z_min 100.0)
           (setq x (- j half-screen-width))
           (setq y (- half-screen-height i))
           (setq collision -1)
           (dolist (triangle object collision)
-            (if (triangle-inside (triangle-project triangle) x y)
-               (setq collision (max collision (triangle-shade triangle)))))
+            (setq centr_z (aref (triangle-centroid triangle) 2))
+            (if (and (< centr_z z_min)
+                 (triangle-inside (triangle-project triangle) x y))
+               (progn (setq collision (triangle-shade triangle))
+                      (setq z_min centr_z))))
           (if (>= collision 0)
               (progn (insert (aref tileset collision))
                      (insert (aref tileset collision)))
-              (insert "..")))
+              (insert "  ")))
         (insert "\n"))))
 
 
+
+(defun animate ()
+  (interactive)
+  (draw-frame cube)
+  (object-rotate cube)
+  )
+
 ;; TESTING GROUNDS --------------------------------------
+
+;; (draw-frame cube)
+(map! :n "q" 'animate)
+
+(with-current-buffer "cube"
+  (erase-buffer))
+
 
 ;; (defun draw ()
 ;;   (interactive)
@@ -146,7 +168,6 @@
 ;; (map! :n "q" 'draw)
 
 
-;; (draw-frame cube)
 
 (provide 'cube)
 ;;; cube.el ends here

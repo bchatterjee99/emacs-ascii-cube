@@ -20,7 +20,7 @@
 ;;; Code:
 
 ;;(setq tileset ",-~:;=!*#$@")
-(setq tileset ".:o@##")
+(setq tileset ".:a@##")
 (load "/mnt/localdisk/__tifr/faltu/lisp/debug.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/garbage.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/matrix.el")
@@ -80,6 +80,8 @@
       )))
 
 (setq theta 0.2)
+(setq theta- -0.2)
+
 (setq Rx (matrix-create (list 1 0 0
                               0 (cos theta) (- (sin theta))
                               0 (sin theta) (cos theta))
@@ -92,6 +94,19 @@
                               (sin theta) (cos theta) 0
                               0 0 1)
                         3 3))
+(setq Rx- (matrix-create (list 1 0 0
+                              0 (cos theta-) (- (sin theta-))
+                              0 (sin theta-) (cos theta-))
+                        3 3))
+(setq Ry- (matrix-create (list (cos theta-) 0 (sin theta-)
+                              0 1 0
+                              (- (sin theta-)) 0 (cos theta-))
+                        3 3))
+(setq Rz- (matrix-create (list (cos theta-) (- (sin theta-)) 0
+                              (sin theta-) (cos theta-) 0
+                              0 0 1)
+                        3 3))
+
 (setq scale2 (matrix-create (list 2 0 0
                                   0 2 0
                                   0 0 2)
@@ -102,13 +117,24 @@
                             3 3))
 
 
-(defun object-rotate (object)
+
+(defun object-rotate (object dir)
   (object-translate object (matrix-create (list 0 0 (- 0 shift size)) 1 3))
   (dolist (triangle object)
     (dolist (vertex triangle)
       (setq tmp vertex)
-      (setq tmp (matrix-mult Rz tmp 3 3 3 1))
-      (setq tmp (matrix-mult Rx tmp 3 3 3 1))
+      (if (= dir 0)
+          (setq tmp (matrix-mult Ry- tmp 3 3 3 1)))
+      (if (= dir 1)
+          (setq tmp (matrix-mult Rx tmp 3 3 3 1)))
+      (if (= dir 2)
+          (setq tmp (matrix-mult Rx- tmp 3 3 3 1)))
+      (if (= dir 3)
+          (setq tmp (matrix-mult Ry tmp 3 3 3 1)))
+      (if (= dir 4)
+          (setq tmp (matrix-mult Rz tmp 3 3 3 1)))
+      (if (= dir 5)
+          (setq tmp (matrix-mult Rz- tmp 3 3 3 1)))
       (aset vertex 0 (aref tmp 0))
       (aset vertex 1 (aref tmp 1))
       (aset vertex 2 (aref tmp 2))))
@@ -120,13 +146,13 @@
 ;; (object-rotate cube)
 
 
-(setq half-screen-width 10)
-(setq half-screen-height 10)
+(setq half-screen-width 15)
+(setq half-screen-height 15)
 
 
 ;; garbale collection
 gc-elapsed
-(setq garbage-collection-messages t)
+(setq garbage-collection-messages nil)
 
 
 
@@ -155,18 +181,47 @@ gc-elapsed
         (insert "\n")))
   (garbage-collect))
 
-
-
 (defun animate ()
   (interactive)
   (draw-frame cube)
-  (object-rotate cube)
+  (object-rotate cube 0)
+  (object-rotate cube 1)
   )
+
+(defun animate-up ()
+  (interactive)
+  (object-rotate cube 2) (draw-frame cube))
+(defun animate-down ()
+  (interactive)
+  (object-rotate cube 1) (draw-frame cube))
+(defun animate-left ()
+  (interactive)
+  (object-rotate cube 0) (draw-frame cube))
+(defun animate-right ()
+  (interactive)
+  (object-rotate cube 3) (draw-frame cube))
+(defun animate-z-left ()
+  (interactive)
+  (object-rotate cube 4) (draw-frame cube))
+(defun animate-z-right ()
+  (interactive)
+  (object-rotate cube 5) (draw-frame cube))
+
+
 
 ;; TESTING GROUNDS --------------------------------------
 
 ;; (draw-frame cube)
-(map! :n "q" 'animate)
+(map! :n "q" #'animate)
+(map! :n [up] #'animate-up)
+(map! :n [down] #'animate-down)
+(map! :n [left] #'animate-z-left)
+(map! :n [right] #'animate-z-right)
+(map! :n "z" #'animate-left)
+(map! :n "m" #'animate-right)
+
+
+
 
 (with-current-buffer "cube"
   (erase-buffer))

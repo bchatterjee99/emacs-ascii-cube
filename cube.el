@@ -19,8 +19,10 @@
 ;;
 ;;; Code:
 
+;;(setq tileset ",-~:;=!*#$@")
 (setq tileset ".:o@##")
 (load "/mnt/localdisk/__tifr/faltu/lisp/debug.el")
+(load "/mnt/localdisk/__tifr/faltu/lisp/garbage.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/matrix.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/triangle.el")
 
@@ -121,6 +123,13 @@
 (setq half-screen-width 10)
 (setq half-screen-height 10)
 
+
+;; garbale collection
+gc-elapsed
+(setq garbage-collection-messages t)
+
+
+
 (defun draw-frame (object)
   (with-current-buffer "cube"
     (erase-buffer)
@@ -130,17 +139,21 @@
           (setq x (- j half-screen-width))
           (setq y (- half-screen-height i))
           (setq collision -1)
+          (setq itr 0)
           (dolist (triangle object collision)
+            ;; (debug-nl (list "dolist  " itr))
             (setq centr_z (aref (triangle-centroid triangle) 2))
             (if (and (< centr_z z_min)
                  (triangle-inside (triangle-project triangle) x y))
                (progn (setq collision (triangle-shade triangle))
-                      (setq z_min centr_z))))
+                      (setq z_min centr_z)))
+            (setq itr (1+ itr)))
           (if (>= collision 0)
               (progn (insert (aref tileset collision))
                      (insert (aref tileset collision)))
               (insert "  ")))
-        (insert "\n"))))
+        (insert "\n")))
+  (garbage-collect))
 
 
 

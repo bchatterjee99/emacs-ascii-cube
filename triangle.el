@@ -24,35 +24,53 @@
 (setq camera-dist 50.0)
 
 (defun  triangle-project (T)
-  (let (ans)
-    (dolist (v T ans)
+  (setq itr 0)
+    (dolist (v T)
       ;; (debug-matrix v 1 3)
+      ;;(debug-nl (list z))
       (setq z (aref v 2))
-      (setq vertex (make-vector 3 0.0))
       ;; (debug-nl (list  "camera-dist=" camera-dist " z=" z))
-      (aset vertex 0 (/ (* camera-dist (aref v 0)) (+ camera-dist z)))
-      (aset vertex 1 (/ (* camera-dist (aref v 1)) (+ camera-dist z)))
-      (aset vertex 2 0)
-      (setq ans (cons vertex ans))
+      (aset (nth itr projected-triangle) 0 (/ (* camera-dist (aref v 0)) (+ camera-dist z)))
+      (aset (nth itr projected-triangle) 1 (/ (* camera-dist (aref v 1)) (+ camera-dist z)))
+      (aset (nth itr projected-triangle) 2 0)
+      (setq itr (1+ itr))
       )
-    )
+  projected-triangle)
+
+;; reset vector to [0 0 0]
+(defun triangle-reset-vector (v)
+  (aset v 0 0.0)
+  (aset v 1 0.0)
+  (aset v 2 0.0)
   )
 
-;; (nth 0 cube)
-;; (triangle-project (nth 0 cube))
-
+;; calculate centroid; store in centroid
 (defun triangle-centroid (T)
-  (let ((ans (make-vector 3 0.0)))
-    (dolist (v T ans)
+  (triangle-reset-vector centroid)
+  (dolist (v T)
+    ;; (debug-matrix ans 1 3)
+    (aset centroid 0 (+ (aref centroid 0) (aref v 0)))
+    (aset centroid 1 (+ (aref centroid 1) (aref v 1)))
+    (aset centroid 2 (+ (aref centroid 2) (aref v 2)))
+    )
+  (aset centroid 0 (/ (aref centroid 0) 3.0))
+  (aset centroid 1 (/ (aref centroid 1) 3.0))
+  (aset centroid 2 (/ (aref centroid 2) 3.0))
+  centroid)
+
+;; calculate centroid; store in tmp-centroid [?]
+(defun triangle-centroid-tmp (T)
+  (triangle-reset-vector tmp-centroid)
+    (dolist (v T)
       ;; (debug-matrix ans 1 3)
-      (aset ans 0 (+ (aref ans 0) (aref v 0)))
-      (aset ans 1 (+ (aref ans 1) (aref v 1)))
-      (aset ans 2 (+ (aref ans 2) (aref v 2)))
+      (aset tmp-centroid 0 (+ (aref tmp-centroid 0) (aref v 0)))
+      (aset tmp-centroid 1 (+ (aref tmp-centroid 1) (aref v 1)))
+      (aset tmp-centroid 2 (+ (aref tmp-centroid 2) (aref v 2)))
       )
-  (aset ans 0 (/ (aref ans 0) 3.0))
-  (aset ans 1 (/ (aref ans 1) 3.0))
-  (aset ans 2 (/ (aref ans 2) 3.0))
-  ans))
+  (aset tmp-centroid 0 (/ (aref tmp-centroid 0) 3.0))
+  (aset tmp-centroid 1 (/ (aref tmp-centroid 1) 3.0))
+  (aset tmp-centroid 2 (/ (aref tmp-centroid 2) 3.0))
+  tmp-centroid)
 
 ;; normalize vector a
 (defun normalize (a)
@@ -66,12 +84,11 @@
 
 ;; returns normlaized cross-product
 (defun cross-product (a b)
-  (setq c (make-vector 3 0.0))
-  (aset c 0 (- (* (aref a 1) (aref b 2)) (* (aref a 2) (aref b 1))))
-  (aset c 1 (- (* (aref a 2) (aref b 0)) (* (aref a 0) (aref b 2))))
-  (aset c 2 (- (* (aref a 0) (aref b 1)) (* (aref a 1) (aref b 0))))
-  (normalize c)
-  c)
+  (aset cross 0 (- (* (aref a 1) (aref b 2)) (* (aref a 2) (aref b 1))))
+  (aset cross 1 (- (* (aref a 2) (aref b 0)) (* (aref a 0) (aref b 2))))
+  (aset cross 2 (- (* (aref a 0) (aref b 1)) (* (aref a 1) (aref b 0))))
+  (normalize cross)
+  cross)
 
 (defun dot-product (a b)
   (+ (* (aref a 0) (aref b 0))
@@ -80,8 +97,6 @@
   )
 
 (defun triangle-normal (T)
-  (setq vec1 (make-vector 3 0))
-  (setq vec2 (make-vector 3 0))
   ;; vec1
   (aset vec1 0 (- (aref (nth 1 T) 0) (aref (nth 0 T) 0)))
   (aset vec1 1 (- (aref (nth 1 T) 1) (aref (nth 0 T) 1)))
@@ -95,18 +110,17 @@
 
 
 (defun triangle-shade (T)
-  (setq camera-dir (make-vector 3 0.0))
-  (setq centr (triangle-centroid T))
-  (aset camera-dir 0 (aref centr 0))
-  (aset camera-dir 1 (aref centr 1))
-  (aset camera-dir 2 (+ (aref centr 2) camera-dist))
+  (triangle-centroid-tmp T)
+  (aset camera-dir 0 (aref tmp-centroid 0))
+  (aset camera-dir 1 (aref tmp-centroid 1))
+  (aset camera-dir 2 (+ (aref tmp-centroid 2) camera-dist))
   (normalize camera-dir)
   (floor (* (1- (length tileset))
             (abs (dot-product camera-dir (triangle-normal T)))))
   )
 
 (defun triangle-inside-div (T px py)
-  (setq centr (triangle-centroid T))
+  (setq centr (triangle-centroid-tmp T))
   (setq cx (aref centr 0))
   (setq cy (aref centr 1))
   (setq x1 (aref (nth 0 T) 0))
@@ -139,9 +153,9 @@
 
 
 (defun triangle-inside (T px py)
-  (setq centr (triangle-centroid T))
-  (setq cx (aref centr 0))
-  (setq cy (aref centr 1))
+  (triangle-centroid-tmp T)
+  (setq cx (aref tmp-centroid 0))
+  (setq cy (aref tmp-centroid 1))
   (setq x1 (aref (nth 0 T) 0))
   (setq y1 (aref (nth 0 T) 1))
   (setq x2 (aref (nth 1 T) 0))
@@ -203,8 +217,10 @@
            [7.0 9.0 8.0]
            [6.0 7.0 6.0]))
 A1
+
 (triangle-normal A1)
-(triangle-centroid A1)
+(triangle-centroid triangle1)
+(triangle-project A1)
 
 (setq A1 '([1.0 2.0 0.0]
            [7.0 9.0 0.0]

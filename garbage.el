@@ -20,34 +20,31 @@
 ;;; Code:
 
 ;; centroid calculated in animation frame
-(setq centroid (make-vector 3 0.0))
+(setq ascii-cube-centroid (make-vector 3 0.0))
 
 ;; tmp centroid for trangle-inside or triangle-shade
-(setq tmp-centroid (make-vector 3 0.0))
+(setq ascii-cube-tmp-centroid (make-vector 3 0.0))
 
 ;; projected triangle
-(setq projected-triangle '([0.0 0.0 0.0]
+(setq ascii-cube-projected-triangle '([0.0 0.0 0.0]
                            [0.0 0.0 0.0]
                            [0.0 0.0 0.0]))
 
 ;; temporary vectors
-(setq vec1 [0.0 0.0 0.0])
-(setq vec2 [0.0 0.0 0.0])
+(setq ascii-cube-vec1 [0.0 0.0 0.0])
+(setq ascii-cube-vec2 [0.0 0.0 0.0])
 
 ;; cross product storage
-(setq cross [0.0 0.0 0.0])
+(setq ascii-cube-cross [0.0 0.0 0.0])
 
 ;; camera-dir
-(setq camera-dir [0.0 0.0 0.0])
+(setq ascii-cube-camera-dir [0.0 0.0 0.0])
 
-;; normal
-(setq normal [0.0 0.0 0.0])
+;; ;; universal iterator
+;; (setq ascii-cube-itr 0)
 
-;; universal iterator
-(setq itr 0)
-
-;; z co-ord lagbe kothau
-(setq z 12.0)
+;; ;; z co-ord lagbe kothau
+;; (setq ascii-cube-z 12.0)
 
 (provide 'garbage)
 ;;; garbage.el ends here

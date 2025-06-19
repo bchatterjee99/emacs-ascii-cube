@@ -20,58 +20,57 @@
 ;;; Code:
 
 ;;(setq tileset ",-~:;=!*#$@")
-(setq tileset ".:a@##")
+(setq ascii-cube-tileset ".:!@##")
 (load "/mnt/localdisk/__tifr/faltu/lisp/debug.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/garbage.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/matrix.el")
 (load "/mnt/localdisk/__tifr/faltu/lisp/triangle.el")
 
 ;; half of size of cube side
-(setq size 10.0)
-(setq shift 20.0)
+(setq ascii-cube-size 10.0)
+(setq ascii-cube-shift 20.0)
 
-(setq T1 (triangle-create (list (- size) (- size) (+ shift)
-                                (- size) (+ size) (+ shift)
-                                (+ size) (+ size) (+ shift))))
-(setq T2 (triangle-create (list (- size) (- size) (+ shift)
-                                (+ size) (- size) (+ shift)
-                                (+ size) (+ size) (+ shift))))
-(setq T3 (triangle-create (list (- size) (+ size) (+ shift)
-                                (- size) (+ size) (+ shift size size)
-                                (+ size) (+ size) (+ shift size size))))
-(setq T4 (triangle-create (list (- size) (+ size) (+ shift)
-                                (+ size) (+ size) (+ shift)
-                                (+ size) (+ size) (+ shift size size))))
-(setq T5 (triangle-create (list (+ size) (- size) (+ shift)
-                                (+ size) (+ size) (+ shift)
-                                (+ size) (+ size) (+ shift size size))))
-(setq T6 (triangle-create (list (+ size) (- size) (+ shift)
-                                (+ size) (- size) (+ shift size size)
-                                (+ size) (+ size) (+ shift size size))))
-
-
-(setq T7 (triangle-create (list (- size) (- size) (+ shift size size)
-                                (- size) (+ size) (+ shift size size)
-                                (+ size) (+ size) (+ shift size size))))
-(setq T8 (triangle-create (list (- size) (- size) (+ shift size size)
-                                (+ size) (- size) (+ shift size size)
-                                (+ size) (+ size) (+ shift size size))))
-(setq T9 (triangle-create (list (- size) (- size) (+ shift)
-                                (- size) (- size) (+ shift size size)
-                                (+ size) (- size) (+ shift size size))))
-(setq T10 (triangle-create (list (- size) (- size) (+ shift)
-                                 (+ size) (- size) (+ shift)
-                                 (+ size) (- size) (+ shift size size))))
-(setq T11 (triangle-create (list (- size) (- size) (+ shift)
-                                 (- size) (+ size) (+ shift)
-                                 (- size) (+ size) (+ shift size size))))
-(setq T12 (triangle-create (list (- size) (- size) (+ shift)
-                                 (- size) (- size) (+ shift size size)
-                                 (- size) (+ size) (+ shift size size))))
+(setq ascii-cube-T1 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                           (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift))))
+(setq ascii-cube-T2 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift))))
+(setq ascii-cube-T3 (ascii-cube-triangle-create (list (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
+                                           (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T4 (ascii-cube-triangle-create (list (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T5 (ascii-cube-triangle-create (list (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T6 (ascii-cube-triangle-create (list (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                           (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
 
 
+(setq ascii-cube-T7 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T8 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (+ ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T9 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                           (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                           (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T10 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                            (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                            (+ ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T11 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                            (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
+                                            (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
+(setq ascii-cube-T12 (ascii-cube-triangle-create (list (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
+                                            (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
+                                            (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
 
-(defun object-translate (object shift)
+
+(defun ascii-cube-translate (object shift)
   (dolist (triangle object)
     (dolist (vertex triangle)
       (aset vertex 0 (+ (aref vertex 0) (aref shift 0)))
@@ -79,161 +78,121 @@
       (aset vertex 2 (+ (aref vertex 2) (aref shift 2)))
       )))
 
-(setq theta 0.2)
-(setq theta- -0.2)
+(setq ascii-cube-theta 0.2)
+(setq ascii-cube-theta- -0.2)
 
-(setq Rx (matrix-create (list 1 0 0
-                              0 (cos theta) (- (sin theta))
-                              0 (sin theta) (cos theta))
+(setq ascii-cube-Rx (ascii-cube-matrix-create (list 1 0 0
+                              0 (cos ascii-cube-theta) (- (sin ascii-cube-theta))
+                              0 (sin ascii-cube-theta) (cos ascii-cube-theta))
                         3 3))
-(setq Ry (matrix-create (list (cos theta) 0 (sin theta)
+(setq ascii-cube-Ry (ascii-cube-matrix-create (list (cos ascii-cube-theta) 0 (sin ascii-cube-theta)
                               0 1 0
-                              (- (sin theta)) 0 (cos theta))
+                              (- (sin ascii-cube-theta)) 0 (cos ascii-cube-theta))
                         3 3))
-(setq Rz (matrix-create (list (cos theta) (- (sin theta)) 0
-                              (sin theta) (cos theta) 0
+(setq ascii-cube-Rz (ascii-cube-matrix-create (list (cos ascii-cube-theta) (- (sin ascii-cube-theta)) 0
+                              (sin ascii-cube-theta) (cos ascii-cube-theta) 0
                               0 0 1)
                         3 3))
-(setq Rx- (matrix-create (list 1 0 0
-                              0 (cos theta-) (- (sin theta-))
-                              0 (sin theta-) (cos theta-))
+(setq ascii-cube-Rx- (ascii-cube-matrix-create (list 1 0 0
+                              0 (cos ascii-cube-theta-) (- (sin ascii-cube-theta-))
+                              0 (sin ascii-cube-theta-) (cos ascii-cube-theta-))
                         3 3))
-(setq Ry- (matrix-create (list (cos theta-) 0 (sin theta-)
+(setq ascii-cube-Ry- (ascii-cube-matrix-create (list (cos ascii-cube-theta-) 0 (sin ascii-cube-theta-)
                               0 1 0
-                              (- (sin theta-)) 0 (cos theta-))
+                              (- (sin ascii-cube-theta-)) 0 (cos ascii-cube-theta-))
                         3 3))
-(setq Rz- (matrix-create (list (cos theta-) (- (sin theta-)) 0
-                              (sin theta-) (cos theta-) 0
+(setq ascii-cube-Rz- (ascii-cube-matrix-create (list (cos ascii-cube-theta-) (- (sin ascii-cube-theta-)) 0
+                              (sin ascii-cube-theta-) (cos ascii-cube-theta-) 0
                               0 0 1)
                         3 3))
 
-(setq scale2 (matrix-create (list 2 0 0
-                                  0 2 0
-                                  0 0 2)
-                            3 3))
-(setq scale3 (matrix-create (list 3 0 0
-                                  0 3 0
-                                  0 0 3)
-                            3 3))
 
-
-
-(defun object-rotate (object dir)
-  (object-translate object (matrix-create (list 0 0 (- 0 shift size)) 1 3))
+(defun ascii-cube-rotate (object dir)
+  (ascii-cube-translate object (ascii-cube-matrix-create (list 0 0 (- 0 ascii-cube-shift ascii-cube-size)) 1 3))
   (dolist (triangle object)
     (dolist (vertex triangle)
       (setq tmp vertex)
       (if (= dir 0)
-          (setq tmp (matrix-mult Ry- tmp 3 3 3 1)))
+          (setq tmp (ascii-cube-matrix-mult ascii-cube-Ry- tmp 3 3 3 1)))
       (if (= dir 1)
-          (setq tmp (matrix-mult Rx tmp 3 3 3 1)))
+          (setq tmp (ascii-cube-matrix-mult ascii-cube-Rx tmp 3 3 3 1)))
       (if (= dir 2)
-          (setq tmp (matrix-mult Rx- tmp 3 3 3 1)))
+          (setq tmp (ascii-cube-matrix-mult ascii-cube-Rx- tmp 3 3 3 1)))
       (if (= dir 3)
-          (setq tmp (matrix-mult Ry tmp 3 3 3 1)))
+          (setq tmp (ascii-cube-matrix-mult ascii-cube-Ry tmp 3 3 3 1)))
       (if (= dir 4)
-          (setq tmp (matrix-mult Rz tmp 3 3 3 1)))
+          (setq tmp (ascii-cube-matrix-mult ascii-cube-Rz tmp 3 3 3 1)))
       (if (= dir 5)
-          (setq tmp (matrix-mult Rz- tmp 3 3 3 1)))
+          (setq tmp (ascii-cube-matrix-mult ascii-cube-Rz- tmp 3 3 3 1)))
       (aset vertex 0 (aref tmp 0))
       (aset vertex 1 (aref tmp 1))
       (aset vertex 2 (aref tmp 2))))
-  (object-translate object (matrix-create (list 0 0 (+ shift size)) 1 3))
+  (ascii-cube-translate object (ascii-cube-matrix-create (list 0 0 (+ ascii-cube-shift ascii-cube-size)) 1 3))
   )
 
-(setq cube (list  T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 T11 T12))
-;; (setq cube (list  T1 T2))
-;; (object-rotate cube)
+(setq ascii-cube (list  ascii-cube-T1 ascii-cube-T2 ascii-cube-T3 ascii-cube-T4
+                  ascii-cube-T5 ascii-cube-T6 ascii-cube-T7 ascii-cube-T8
+                  ascii-cube-T9 ascii-cube-T10 ascii-cube-T11 ascii-cube-T12))
+
+(setq ascii-cube-half-screen-width 15)
+(setq ascii-cube-half-screen-height 15)
+
+;; garbage collection
+;; gc-elapsed
+;; (setq garbage-collection-messages nil)
 
 
-(setq half-screen-width 15)
-(setq half-screen-height 15)
-
-
-;; garbale collection
-gc-elapsed
-(setq garbage-collection-messages nil)
-
-
-
-(defun draw-frame (object)
-  (with-current-buffer "cube"
+(defun ascii-cube-draw-frame (object)
+  (with-current-buffer "ascii-cube"
     (erase-buffer)
-      (dotimes (i (* 2 half-screen-width))
-        (dotimes (j (* 2 half-screen-width))
+      (dotimes (i (* 2 ascii-cube-half-screen-width))
+        (dotimes (j (* 2 ascii-cube-half-screen-width))
           (setq z_min 100.0)
-          (setq x (- j half-screen-width))
-          (setq y (- half-screen-height i))
-          (setq collision -1)
-          (setq itr 0)
-          (dolist (triangle object collision)
+          (setq x (- j ascii-cube-half-screen-width))
+          (setq y (- ascii-cube-half-screen-height i))
+          (setq ascii-cube-collision -1)
+          (dolist (triangle object)
             ;; (debug-nl (list "dolist  " itr))
-            (setq centr_z (aref (triangle-centroid triangle) 2))
+            (setq centr_z (aref (ascii-cube-triangle-centroid triangle) 2))
             (if (and (< centr_z z_min)
-                 (triangle-inside (triangle-project triangle) x y))
-               (progn (setq collision (triangle-shade triangle))
-                      (setq z_min centr_z)))
-            (setq itr (1+ itr)))
-          (if (>= collision 0)
-              (progn (insert (aref tileset collision))
-                     (insert (aref tileset collision)))
+                 (ascii-cube-triangle-inside (ascii-cube-triangle-project triangle) x y))
+               (progn (setq ascii-cube-collision (ascii-cube-triangle-shade triangle))
+                      (setq z_min centr_z))))
+          (if (>= ascii-cube-collision 0)
+              (progn (insert (aref ascii-cube-tileset ascii-cube-collision))
+                     (insert (aref ascii-cube-tileset ascii-cube-collision)))
               (insert "  ")))
-        (insert "\n")))
+        (insert "\n"))
+      (put-text-property 1 2 'keymap ascii-cube-keymap)
+      (beginning-of-buffer))
   (garbage-collect))
 
-(defun animate ()
+
+(defun ascii-cube-animate ()
   (interactive)
-  (draw-frame cube)
-  (object-rotate cube 0)
-  (object-rotate cube 1)
+  (draw-frame ascii-cube)
+  (ascii-cube-rotate ascii-cube 0)
+  (ascii-cube-rotate ascii-cube 1)
   )
 
-(defun animate-up ()
+(defun ascii-cube-animate-up ()
   (interactive)
-  (object-rotate cube 2) (draw-frame cube))
-(defun animate-down ()
+  (ascii-cube-rotate ascii-cube 2) (ascii-cube-draw-frame ascii-cube))
+(defun ascii-cube-animate-down ()
   (interactive)
-  (object-rotate cube 1) (draw-frame cube))
-(defun animate-left ()
+  (ascii-cube-rotate ascii-cube 1) (ascii-cube-draw-frame ascii-cube))
+(defun ascii-cube-animate-left ()
   (interactive)
-  (object-rotate cube 0) (draw-frame cube))
-(defun animate-right ()
+  (ascii-cube-rotate ascii-cube 0) (ascii-cube-draw-frame ascii-cube))
+(defun ascii-cube-animate-right ()
   (interactive)
-  (object-rotate cube 3) (draw-frame cube))
-(defun animate-z-left ()
+  (ascii-cube-rotate ascii-cube 3) (ascii-cube-draw-frame ascii-cube))
+(defun ascii-cube-animate-z-left ()
   (interactive)
-  (object-rotate cube 4) (draw-frame cube))
-(defun animate-z-right ()
+  (ascii-cube-rotate ascii-cube 4) (ascii-cube-draw-frame ascii-cube))
+(defun ascii-cube-animate-z-right ()
   (interactive)
-  (object-rotate cube 5) (draw-frame cube))
-
-
-
-;; TESTING GROUNDS --------------------------------------
-
-;; (draw-frame cube)
-(map! :n "q" #'animate)
-(map! :n [up] #'animate-up)
-(map! :n [down] #'animate-down)
-(map! :n [left] #'animate-z-left)
-(map! :n [right] #'animate-z-right)
-(map! :n "z" #'animate-left)
-(map! :n "m" #'animate-right)
-
-
-
-
-(with-current-buffer "cube"
-  (erase-buffer))
-
-
-;; (defun draw ()
-;;   (interactive)
-;;   (with-current-buffer "cube"
-;;     (insert "a\n"))
-;;   )
-;; (draw)
-;; (map! :n "q" 'draw)
+  (ascii-cube-rotate ascii-cube 5) (ascii-cube-draw-frame ascii-cube))
 
 
 

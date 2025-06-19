@@ -21,59 +21,59 @@
 
 
 
-(setq camera-dist 50.0)
+(setq ascii-cube-camera-dist 50.0)
 
-(defun  triangle-project (T)
+(defun  ascii-cube-triangle-project (T)
   (setq itr 0)
     (dolist (v T)
       ;; (debug-matrix v 1 3)
       ;;(debug-nl (list z))
       (setq z (aref v 2))
-      ;; (debug-nl (list  "camera-dist=" camera-dist " z=" z))
-      (aset (nth itr projected-triangle) 0 (/ (* camera-dist (aref v 0)) (+ camera-dist z)))
-      (aset (nth itr projected-triangle) 1 (/ (* camera-dist (aref v 1)) (+ camera-dist z)))
-      (aset (nth itr projected-triangle) 2 0)
+      ;; (debug-nl (list  "ascii-cube-camera-dist=" ascii-cube-camera-dist " z=" z))
+      (aset (nth itr ascii-cube-projected-triangle) 0 (/ (* ascii-cube-camera-dist (aref v 0)) (+ ascii-cube-camera-dist z)))
+      (aset (nth itr ascii-cube-projected-triangle) 1 (/ (* ascii-cube-camera-dist (aref v 1)) (+ ascii-cube-camera-dist z)))
+      (aset (nth itr ascii-cube-projected-triangle) 2 0)
       (setq itr (1+ itr))
       )
-  projected-triangle)
+  ascii-cube-projected-triangle)
 
 ;; reset vector to [0 0 0]
-(defun triangle-reset-vector (v)
+(defun ascii-cube-triangle-reset-vector (v)
   (aset v 0 0.0)
   (aset v 1 0.0)
   (aset v 2 0.0)
   )
 
 ;; calculate centroid; store in centroid
-(defun triangle-centroid (T)
-  (triangle-reset-vector centroid)
+(defun ascii-cube-triangle-centroid (T)
+  (ascii-cube-triangle-reset-vector centroid)
   (dolist (v T)
     ;; (debug-matrix ans 1 3)
-    (aset centroid 0 (+ (aref centroid 0) (aref v 0)))
-    (aset centroid 1 (+ (aref centroid 1) (aref v 1)))
-    (aset centroid 2 (+ (aref centroid 2) (aref v 2)))
+    (aset ascii-cube-centroid 0 (+ (aref ascii-cube-centroid 0) (aref v 0)))
+    (aset ascii-cube-centroid 1 (+ (aref ascii-cube-centroid 1) (aref v 1)))
+    (aset ascii-cube-centroid 2 (+ (aref ascii-cube-centroid 2) (aref v 2)))
     )
-  (aset centroid 0 (/ (aref centroid 0) 3.0))
-  (aset centroid 1 (/ (aref centroid 1) 3.0))
-  (aset centroid 2 (/ (aref centroid 2) 3.0))
-  centroid)
+  (aset ascii-cube-centroid 0 (/ (aref ascii-cube-centroid 0) 3.0))
+  (aset ascii-cube-centroid 1 (/ (aref ascii-cube-centroid 1) 3.0))
+  (aset ascii-cube-centroid 2 (/ (aref ascii-cube-centroid 2) 3.0))
+  ascii-cube-centroid)
 
 ;; calculate centroid; store in tmp-centroid [?]
-(defun triangle-centroid-tmp (T)
-  (triangle-reset-vector tmp-centroid)
+(defun ascii-cube-triangle-centroid-tmp (T)
+  (ascii-cube-triangle-reset-vector ascii-cube-tmp-centroid)
     (dolist (v T)
       ;; (debug-matrix ans 1 3)
-      (aset tmp-centroid 0 (+ (aref tmp-centroid 0) (aref v 0)))
-      (aset tmp-centroid 1 (+ (aref tmp-centroid 1) (aref v 1)))
-      (aset tmp-centroid 2 (+ (aref tmp-centroid 2) (aref v 2)))
+      (aset ascii-cube-tmp-centroid 0 (+ (aref ascii-cube-tmp-centroid 0) (aref v 0)))
+      (aset ascii-cube-tmp-centroid 1 (+ (aref ascii-cube-tmp-centroid 1) (aref v 1)))
+      (aset ascii-cube-tmp-centroid 2 (+ (aref ascii-cube-tmp-centroid 2) (aref v 2)))
       )
-  (aset tmp-centroid 0 (/ (aref tmp-centroid 0) 3.0))
-  (aset tmp-centroid 1 (/ (aref tmp-centroid 1) 3.0))
-  (aset tmp-centroid 2 (/ (aref tmp-centroid 2) 3.0))
-  tmp-centroid)
+  (aset ascii-cube-tmp-centroid 0 (/ (aref ascii-cube-tmp-centroid 0) 3.0))
+  (aset ascii-cube-tmp-centroid 1 (/ (aref ascii-cube-tmp-centroid 1) 3.0))
+  (aset ascii-cube-tmp-centroid 2 (/ (aref ascii-cube-tmp-centroid 2) 3.0))
+  ascii-cube-tmp-centroid)
 
 ;; normalize vector a
-(defun normalize (a)
+(defun ascii-cube-normalize (a)
   (setq len (sqrt (+ (expt (aref a 0) 2)
                      (expt (aref a 1) 2)
                      (expt (aref a 2) 2))))
@@ -83,44 +83,44 @@
   )
 
 ;; returns normlaized cross-product
-(defun cross-product (a b)
-  (aset cross 0 (- (* (aref a 1) (aref b 2)) (* (aref a 2) (aref b 1))))
-  (aset cross 1 (- (* (aref a 2) (aref b 0)) (* (aref a 0) (aref b 2))))
-  (aset cross 2 (- (* (aref a 0) (aref b 1)) (* (aref a 1) (aref b 0))))
-  (normalize cross)
-  cross)
+(defun ascii-cube-cross-product (a b)
+  (aset ascii-cube-cross 0 (- (* (aref a 1) (aref b 2)) (* (aref a 2) (aref b 1))))
+  (aset ascii-cube-cross 1 (- (* (aref a 2) (aref b 0)) (* (aref a 0) (aref b 2))))
+  (aset ascii-cube-cross 2 (- (* (aref a 0) (aref b 1)) (* (aref a 1) (aref b 0))))
+  (ascii-cube-normalize ascii-cube-cross)
+  ascii-cube-cross)
 
-(defun dot-product (a b)
+(defun ascii-cube-dot-product (a b)
   (+ (* (aref a 0) (aref b 0))
      (* (aref a 1) (aref b 1))
      (* (aref a 2) (aref b 2)))
   )
 
-(defun triangle-normal (T)
+(defun ascii-cube-triangle-normal (T)
   ;; vec1
-  (aset vec1 0 (- (aref (nth 1 T) 0) (aref (nth 0 T) 0)))
-  (aset vec1 1 (- (aref (nth 1 T) 1) (aref (nth 0 T) 1)))
-  (aset vec1 2 (- (aref (nth 1 T) 2) (aref (nth 0 T) 2)))
+  (aset ascii-cube-vec1 0 (- (aref (nth 1 T) 0) (aref (nth 0 T) 0)))
+  (aset ascii-cube-vec1 1 (- (aref (nth 1 T) 1) (aref (nth 0 T) 1)))
+  (aset ascii-cube-vec1 2 (- (aref (nth 1 T) 2) (aref (nth 0 T) 2)))
   ;; vec2
-  (aset vec2 0 (- (aref (nth 2 T) 0) (aref (nth 0 T) 0)))
-  (aset vec2 1 (- (aref (nth 2 T) 1) (aref (nth 0 T) 1)))
-  (aset vec2 2 (- (aref (nth 2 T) 2) (aref (nth 0 T) 2)))
-  (cross-product vec1 vec2)
+  (aset ascii-cube-vec2 0 (- (aref (nth 2 T) 0) (aref (nth 0 T) 0)))
+  (aset ascii-cube-vec2 1 (- (aref (nth 2 T) 1) (aref (nth 0 T) 1)))
+  (aset ascii-cube-vec2 2 (- (aref (nth 2 T) 2) (aref (nth 0 T) 2)))
+  (ascii-cube-cross-product ascii-cube-vec1 ascii-cube-vec2)
   )
 
 
-(defun triangle-shade (T)
-  (triangle-centroid-tmp T)
-  (aset camera-dir 0 (aref tmp-centroid 0))
-  (aset camera-dir 1 (aref tmp-centroid 1))
-  (aset camera-dir 2 (+ (aref tmp-centroid 2) camera-dist))
-  (normalize camera-dir)
-  (floor (* (1- (length tileset))
-            (abs (dot-product camera-dir (triangle-normal T)))))
+(defun ascii-cube-triangle-shade (T)
+  (ascii-cube-triangle-centroid-tmp T)
+  (aset ascii-cube-camera-dir 0 (aref tmp-centroid 0))
+  (aset ascii-cube-camera-dir 1 (aref tmp-centroid 1))
+  (aset ascii-cube-camera-dir 2 (+ (aref tmp-centroid 2) ascii-cube-camera-dist))
+  (ascii-cube-normalize ascii-cube-camera-dir)
+  (floor (* (1- (length ascii-cube-tileset))
+            (abs (ascii-cube-dot-product ascii-cube-camera-dir (ascii-cube-triangle-normal T)))))
   )
 
-(defun triangle-inside-div (T px py)
-  (setq centr (triangle-centroid-tmp T))
+(defun ascii-cube-triangle-inside-div (T px py)
+  (setq centr (ascii-cube-triangle-centroid-tmp T))
   (setq cx (aref centr 0))
   (setq cy (aref centr 1))
   (setq x1 (aref (nth 0 T) 0))
@@ -152,8 +152,8 @@
   )
 
 
-(defun triangle-inside (T px py)
-  (triangle-centroid-tmp T)
+(defun ascii-cube-triangle-inside (T px py)
+  (ascii-cube-triangle-centroid-tmp T)
   (setq cx (aref tmp-centroid 0))
   (setq cy (aref tmp-centroid 1))
   (setq x1 (aref (nth 0 T) 0))
@@ -184,7 +184,7 @@
        )
   )
 
-(defun triangle-create (L)
+(defun ascii-cube-triangle-create (L)
   (setq T ())
   (setq vert (make-vector 3 0.0))
   (aset vert 0 (nth 0 L))
@@ -208,32 +208,32 @@
 ;; TESTING GROUNDS ---------------------------------------
 
 
-(setq  triangle1 '([0.0 0.0 5.0]
-                   [0.0 1.0 5.0]
-                   [1.0 0.0 5.0]))
-(triangle-normal triangle1)
-(triangle-project triangle1)
-(setq A1 '([1.0 2.0 3.0]
-           [7.0 9.0 8.0]
-           [6.0 7.0 6.0]))
-A1
+;; (setq  triangle1 '([0.0 0.0 5.0]
+;;                    [0.0 1.0 5.0]
+;;                    [1.0 0.0 5.0]))
+;; (triangle-normal triangle1)
+;; (triangle-project triangle1)
+;; (setq A1 '([1.0 2.0 3.0]
+;;            [7.0 9.0 8.0]
+;;            [6.0 7.0 6.0]))
+;; A1
 
-(triangle-normal A1)
-(triangle-centroid triangle1)
-(triangle-project A1)
+;; (triangle-normal A1)
+;; (triangle-centroid triangle1)
+;; (triangle-project A1)
 
-(setq A1 '([1.0 2.0 0.0]
-           [7.0 9.0 0.0]
-           [6.0 7.0 0.0]))
-(setq cnt (triangle-centroid A1))
-(triangle-inside A1 (aref cnt 0) (aref cnt 1))
+;; (setq A1 '([1.0 2.0 0.0]
+;;            [7.0 9.0 0.0]
+;;            [6.0 7.0 0.0]))
+;; (setq cnt (triangle-centroid A1))
+;; (triangle-inside A1 (aref cnt 0) (aref cnt 1))
 
-(triangle-shade A1)
-;;(insert 79)
+;; (triangle-shade A1)
+;; ;;(insert 79)
 
-(triangle-create (list 1 2 3
-                       4 5 6
-                       7 8 9))
+;; (triangle-create (list 1 2 3
+;;                        4 5 6
+;;                        7 8 9))
 
 
 ;; (setq vec1 [1.0 2.0 3.0])

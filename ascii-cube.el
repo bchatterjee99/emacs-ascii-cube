@@ -19,27 +19,42 @@
 ;;
 ;;; Code:
 
+;; Settings -------------------------------------------
+(setq ascii-cube-new-window t)
+(setq ascii-cube-half-screen-width 15)
+(setq ascii-cube-half-screen-height 15)
+(setq ascii-cube-light-dir [-10 -10 10])
+(setq ascii-cube-shift 20.0)
+;; half of size of cube side
+(setq ascii-cube-size 10.0)
+
+;; Settings -------------------------------------------
+
 ;; garbage.el -----------------------------------------
 ;; centroid calculated in animation frame
 (setq ascii-cube-centroid (make-vector 3 0.0))
-
 ;; tmp centroid for trangle-inside or triangle-shade
 (setq ascii-cube-tmp-centroid (make-vector 3 0.0))
-
 ;; projected triangle
 (setq ascii-cube-projected-triangle '([0.0 0.0 0.0]
                            [0.0 0.0 0.0]
                            [0.0 0.0 0.0]))
-
 ;; temporary vectors
 (setq ascii-cube-vec1 [0.0 0.0 0.0])
 (setq ascii-cube-vec2 [0.0 0.0 0.0])
-
 ;; cross product storage
 (setq ascii-cube-cross [0.0 0.0 0.0])
-
 ;; camera-dir
 (setq ascii-cube-camera-dir [0.0 0.0 0.0])
+;; reflected-ray
+(setq ascii-cube-reflected-ray [0.0 0.0 0.0])
+;; z-min
+(setq ascii-cube-z_min 100.0)
+;; collision
+(setq ascii-cube-collision 0)
+;; global co-ord
+(setq ascii-cube-x 0)
+(setq ascii-cube-y 0)
 ;; garbage.el -----------------------------------------
 
 ;; matrix.el -----------------------------------
@@ -73,7 +88,7 @@ C)
 ;; matrix.el -----------------------------------
 
 ;; triangle.el----------------------------------
-(setq ascii-cube-tileset ".:!@##")
+(setq ascii-cube-tileset ".::!!!@@@####")
 (setq ascii-cube-camera-dist 50.0)
 
 (defun  ascii-cube-triangle-project (T)
@@ -158,18 +173,47 @@ C)
   (aset ascii-cube-vec2 0 (- (aref (nth 2 T) 0) (aref (nth 0 T) 0)))
   (aset ascii-cube-vec2 1 (- (aref (nth 2 T) 1) (aref (nth 0 T) 1)))
   (aset ascii-cube-vec2 2 (- (aref (nth 2 T) 2) (aref (nth 0 T) 2)))
-  (ascii-cube-cross-product ascii-cube-vec1 ascii-cube-vec2)
-  )
+  (ascii-cube-cross-product ascii-cube-vec1 ascii-cube-vec2))
+
+(defun ascii-cube-vec-negate (vec)
+  (aset vec 0 (- (aref vec 0)))
+  (aset vec 1 (- (aref vec 1)))
+  (aset vec 2 (- (aref vec 2)))
+  vec)
+
+(defun ascii-cube-reflected-ray (T)
+  (setq normal (ascii-cube-triangle-normal T))
+  (setq dot (ascii-cube-dot-product normal ascii-cube-light-dir))
+  ;; (if (> dot 0)
+  ;;    (ascii-cube-vec-negate normal)) ;; multiplying with dot takes care of dir
+  ;; (ascii-cube-normalize normal) ;; already normalized
+  (aset ascii-cube-reflected-ray 0 (- (aref ascii-cube-light-dir 0)
+                                      (* dot (aref normal 0))
+                                      (* dot (aref normal 0))))
+  (aset ascii-cube-reflected-ray 1 (- (aref ascii-cube-light-dir 1)
+                                      (* dot (aref normal 1))
+                                      (* dot (aref normal 1))))
+  (aset ascii-cube-reflected-ray 2 (- (aref ascii-cube-light-dir 2)
+                                      (* dot (aref normal 2))
+                                      (* dot (aref normal 2))))
+  (ascii-cube-normalize ascii-cube-reflected-ray)
+  ascii-cube-reflected-ray)
+
+(defun ascii-cube-non-zero (a)
+  (if (< a 0) 0 a))
 
 
 (defun ascii-cube-triangle-shade (T)
   (ascii-cube-triangle-centroid-tmp T)
-  (aset ascii-cube-camera-dir 0 (aref ascii-cube-tmp-centroid 0))
-  (aset ascii-cube-camera-dir 1 (aref ascii-cube-tmp-centroid 1))
-  (aset ascii-cube-camera-dir 2 (+ (aref ascii-cube-tmp-centroid 2) ascii-cube-camera-dist))
+  ;; (aset ascii-cube-camera-dir 0 (aref ascii-cube-tmp-centroid 0))
+  ;; (aset ascii-cube-camera-dir 1 (aref ascii-cube-tmp-centroid 1))
+  ;; (aset ascii-cube-camera-dir 2 (+ (aref ascii-cube-tmp-centroid 2) ascii-cube-camera-dist))
+  (aset ascii-cube-camera-dir 0 0)
+  (aset ascii-cube-camera-dir 1 0)
+  (aset ascii-cube-camera-dir 2 -1)
   (ascii-cube-normalize ascii-cube-camera-dir)
   (floor (* (1- (length ascii-cube-tileset))
-            (abs (ascii-cube-dot-product ascii-cube-camera-dir (ascii-cube-triangle-normal T)))))
+            (ascii-cube-non-zero (ascii-cube-dot-product ascii-cube-camera-dir (ascii-cube-reflected-ray T)))))
   )
 
 (defun ascii-cube-triangle-inside-div (T px py)
@@ -203,6 +247,7 @@ C)
               ))
        )
   )
+
 
 ;; check if (px, py) is inside triangle T
 (defun ascii-cube-triangle-inside (T px py)
@@ -258,9 +303,6 @@ C)
 ;; triangle.el----------------------------------
 
 ;; cube.el -------------------------------------
-;; half of size of cube side
-(setq ascii-cube-size 10.0)
-(setq ascii-cube-shift 20.0)
 
 (setq ascii-cube-T1 (ascii-cube-triangle-create (list
                                                  (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
@@ -378,30 +420,49 @@ C)
                   ascii-cube-T5 ascii-cube-T6 ascii-cube-T7 ascii-cube-T8
                   ascii-cube-T9 ascii-cube-T10 ascii-cube-T11 ascii-cube-T12))
 
-(setq ascii-cube-half-screen-width 15)
-(setq ascii-cube-half-screen-height 15)
-
-;; garbage collection
+;;;; garbage collection
 ;; gc-elapsed
 ;; (setq garbage-collection-messages nil)
+(setq ascii-cube-new-window t)
 
+
+              ;;                         ########
+              ;;             ####################
+              ;;       ##########################
+              ;;   ......########################
+              ;; ........##########################
+              ;; ........##########################
+              ;; ........##########################
+              ;; ..........########################
+              ;; ..........##########################
+              ;;   ........##########################
+              ;;   ........##########################
+              ;;   ..........########################
+              ;;   ..........##########################
+              ;;     ........######################
+              ;;     ........##############
+              ;;     ..........######
+
+
+(defun ascii-cube-triangle-collision (T)
+  (setq centr_z (aref (ascii-cube-triangle-centroid T) 2))
+  (if (and (< centr_z ascii-cube-z_min)
+           (ascii-cube-triangle-inside (ascii-cube-triangle-project T) ascii-cube-x ascii-cube-y))
+      (progn (setq ascii-cube-collision (ascii-cube-triangle-shade T))
+             (setq ascii-cube-z_min centr_z))))
 
 (defun ascii-cube-draw-frame (object)
   (with-current-buffer "ascii-cube"
     (erase-buffer)
       (dotimes (i (* 2 ascii-cube-half-screen-width))
         (dotimes (j (* 2 ascii-cube-half-screen-width))
-          (setq z_min 100.0)
-          (setq x (- j ascii-cube-half-screen-width))
-          (setq y (- ascii-cube-half-screen-height i))
+          (setq ascii-cube-z_min 100.0)
+          (setq ascii-cube-x (- j ascii-cube-half-screen-width))
+          (setq ascii-cube-y (- ascii-cube-half-screen-height i))
           (setq ascii-cube-collision -1)
-          (dolist (triangle object)
+          (mapc #'ascii-cube-triangle-collision object)
+          ;; (dolist (triangle object)
             ;; (debug-nl (list "dolist  " itr))
-            (setq centr_z (aref (ascii-cube-triangle-centroid triangle) 2))
-            (if (and (< centr_z z_min)
-                 (ascii-cube-triangle-inside (ascii-cube-triangle-project triangle) x y))
-               (progn (setq ascii-cube-collision (ascii-cube-triangle-shade triangle))
-                      (setq z_min centr_z))))
           (if (>= ascii-cube-collision 0)
               (progn (insert (aref ascii-cube-tileset ascii-cube-collision))
                      (insert (aref ascii-cube-tileset ascii-cube-collision)))
@@ -414,7 +475,7 @@ C)
 
 (defun ascii-cube-animate ()
   (interactive)
-  (draw-frame ascii-cube)
+  (ascii-cube-draw-frame ascii-cube)
   (ascii-cube-rotate ascii-cube 0)
   (ascii-cube-rotate ascii-cube 1)
   )
@@ -439,24 +500,45 @@ C)
   (ascii-cube-rotate ascii-cube 5) (ascii-cube-draw-frame ascii-cube))
 ;; cube.el -------------------------------------
 
+(defun ascii-cube-close ()
+  (interactive)
+  (if ascii-cube-new-window
+      (kill-buffer-and-window)
+    (kill-buffer "ascii-cube")))
 
 
-(setq ascii-cube-keymap (define-keymap
-                     "w" #'ascii-cube-animate-up
-                     "s" #'ascii-cube-animate-down
-                     "a" #'ascii-cube-animate-z-left
-                     "d" #'ascii-cube-animate-z-right
-                     "q" #'ascii-cube-animate-left
-                     "e" #'ascii-cube-animate-right
-                     "x" #'kill-buffer-and-window))
+(setq ascii-cube-keymap (make-sparse-keymap))
+(define-key ascii-cube-keymap "w" #'ascii-cube-animate-up)
+(define-key ascii-cube-keymap "s" #'ascii-cube-animate-down)
+(define-key ascii-cube-keymap "a" #'ascii-cube-animate-z-left)
+(define-key ascii-cube-keymap "d" #'ascii-cube-animate-z-right)
+(define-key ascii-cube-keymap "q" #'ascii-cube-animate-left)
+(define-key ascii-cube-keymap "e" #'ascii-cube-animate-right)
+(define-key ascii-cube-keymap "x" #'ascii-cube-close)
 
+
+;; (setq ascii-cube-keymap (define-keymap
+;;                      "w" #'ascii-cube-animate-up
+;;                      "s" #'ascii-cube-animate-down
+;;                      "a" #'ascii-cube-animate-z-left
+;;                      "d" #'ascii-cube-animate-z-right
+;;                      "q" #'ascii-cube-animate-left
+;;                      "e" #'ascii-cube-animate-right
+;;                      "x" #'kill-buffer-and-window))
 
 (defun ascii-cube ()
   (interactive)
-  (split-window nil (- (window-total-width) (* 2 ascii-cube-half-screen-width) 30) t)
-  (other-window 1)
+  ;; (kill-buffer "ascii-cube")
+  (delete-other-windows)
+  (if ascii-cube-new-window
+      (progn (split-window nil (- (window-total-width) (* 2 ascii-cube-half-screen-width) 30) t)
+             (other-window 1)))
   (get-buffer-create "ascii-cube")
   (set-window-buffer nil "ascii-cube")
+  (ascii-cube-rotate ascii-cube 1)
+  (ascii-cube-rotate ascii-cube 1)
+  (ascii-cube-rotate ascii-cube 5)
+  (ascii-cube-rotate ascii-cube 5)
   (ascii-cube-draw-frame ascii-cube))
 
 (provide 'ascii-cube)

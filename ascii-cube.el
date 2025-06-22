@@ -19,7 +19,7 @@
 ;;
 ;;; Code:
 
-;; Settings -------------------------------------------
+;;; Settings -------------------------------------------
 (setq ascii-cube-new-window t)
 (setq ascii-cube-half-screen-width 15)
 (setq ascii-cube-half-screen-height 15)
@@ -27,10 +27,10 @@
 (setq ascii-cube-shift 20.0)
 ;; half of size of cube side
 (setq ascii-cube-size 10.0)
+;;; Settings -------------------------------------------
 
-;; Settings -------------------------------------------
-
-;; garbage.el -----------------------------------------
+;;; garbage.el -----------------------------------------
+;; [ global storage to reduce garbage ]
 ;; centroid calculated in animation frame
 (setq ascii-cube-centroid (make-vector 3 0.0))
 ;; tmp centroid for trangle-inside or triangle-shade
@@ -65,7 +65,6 @@
 (defun ascii-cube-mset (A row col i j val)
   (aset A (+ (* i col) j)
         val))
-
 (defun ascii-cube-matrix-mult (A B row1 col1 row2 col2)
   ;; (debug-nl (list "entered ascii-cube-matrix-mult" row1 col1 row2 col2))
 (setq C (ascii-cube-matrix row1 col2))
@@ -77,7 +76,6 @@
       ;; (debug-matrix C row1 col2)
       )))
 C)
-
 (defun ascii-cube-matrix-create (arr row col)
   (setq M (ascii-cube-matrix row col))
   (setq i 0)
@@ -91,6 +89,7 @@ C)
 (setq ascii-cube-tileset ".::!!!@@@####")
 (setq ascii-cube-camera-dist 50.0)
 
+;; perspective projection
 (defun  ascii-cube-triangle-project (T)
   (setq itr 0)
     (dolist (v T)
@@ -158,12 +157,14 @@ C)
   (ascii-cube-normalize ascii-cube-cross)
   ascii-cube-cross)
 
+;; dot product
 (defun ascii-cube-dot-product (a b)
   (+ (* (aref a 0) (aref b 0))
      (* (aref a 1) (aref b 1))
      (* (aref a 2) (aref b 2)))
   )
 
+;; normal
 (defun ascii-cube-triangle-normal (T)
   ;; vec1
   (aset ascii-cube-vec1 0 (- (aref (nth 1 T) 0) (aref (nth 0 T) 0)))
@@ -175,12 +176,14 @@ C)
   (aset ascii-cube-vec2 2 (- (aref (nth 2 T) 2) (aref (nth 0 T) 2)))
   (ascii-cube-cross-product ascii-cube-vec1 ascii-cube-vec2))
 
+;; - vec
 (defun ascii-cube-vec-negate (vec)
   (aset vec 0 (- (aref vec 0)))
   (aset vec 1 (- (aref vec 1)))
   (aset vec 2 (- (aref vec 2)))
   vec)
 
+;; direction of reflected ray
 (defun ascii-cube-reflected-ray (T)
   (setq normal (ascii-cube-triangle-normal T))
   (setq dot (ascii-cube-dot-product normal ascii-cube-light-dir))
@@ -199,10 +202,11 @@ C)
   (ascii-cube-normalize ascii-cube-reflected-ray)
   ascii-cube-reflected-ray)
 
+;; non-zero
 (defun ascii-cube-non-zero (a)
   (if (< a 0) 0 a))
 
-
+;; tile required based on amount of light
 (defun ascii-cube-triangle-shade (T)
   (ascii-cube-triangle-centroid-tmp T)
   ;; (aset ascii-cube-camera-dir 0 (aref ascii-cube-tmp-centroid 0))
@@ -216,6 +220,7 @@ C)
             (ascii-cube-non-zero (ascii-cube-dot-product ascii-cube-camera-dir (ascii-cube-reflected-ray T)))))
   )
 
+;; if (px, py) is inside T
 (defun ascii-cube-triangle-inside-div (T px py)
   (setq centr (ascii-cube-triangle-centroid-tmp T))
   (setq cx (aref centr 0))
@@ -248,8 +253,7 @@ C)
        )
   )
 
-
-;; check if (px, py) is inside triangle T
+;; if (px, py) is inside T; without division
 (defun ascii-cube-triangle-inside (T px py)
   (ascii-cube-triangle-centroid-tmp T)
   (setq cx (aref ascii-cube-tmp-centroid 0))
@@ -282,6 +286,7 @@ C)
        )
   )
 
+;; triangle memory allocation; outside animation
 (defun ascii-cube-triangle-create (L)
   (setq T ())
   (setq vert (make-vector 3 0.0))
@@ -303,7 +308,6 @@ C)
 ;; triangle.el----------------------------------
 
 ;; cube.el -------------------------------------
-
 (setq ascii-cube-T1 (ascii-cube-triangle-create (list
                                                  (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift)
                                                  (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift)
@@ -355,7 +359,7 @@ C)
                                                   (- ascii-cube-size) (- ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size)
                                                   (- ascii-cube-size) (+ ascii-cube-size) (+ ascii-cube-shift ascii-cube-size ascii-cube-size))))
 
-
+;; trnaslate
 (defun ascii-cube-translate (object shift)
   (dolist (triangle object)
     (dolist (vertex triangle)
@@ -364,9 +368,11 @@ C)
       (aset vertex 2 (+ (aref vertex 2) (aref shift 2)))
       )))
 
+;; rotation angle
 (setq ascii-cube-theta 0.2)
 (setq ascii-cube-theta- -0.2)
 
+;; rotation matrix
 (setq ascii-cube-Rx (ascii-cube-matrix-create (list 1 0 0
                               0 (cos ascii-cube-theta) (- (sin ascii-cube-theta))
                               0 (sin ascii-cube-theta) (cos ascii-cube-theta))
@@ -392,7 +398,7 @@ C)
                               0 0 1)
                         3 3))
 
-
+;; rotate
 (defun ascii-cube-rotate (object dir)
   (ascii-cube-translate object (ascii-cube-matrix-create (list 0 0 (- 0 ascii-cube-shift ascii-cube-size)) 1 3))
   (dolist (triangle object)
@@ -416,6 +422,7 @@ C)
   (ascii-cube-translate object (ascii-cube-matrix-create (list 0 0 (+ ascii-cube-shift ascii-cube-size)) 1 3))
   )
 
+;; list of triangles in object
 (setq ascii-cube (list  ascii-cube-T1 ascii-cube-T2 ascii-cube-T3 ascii-cube-T4
                   ascii-cube-T5 ascii-cube-T6 ascii-cube-T7 ascii-cube-T8
                   ascii-cube-T9 ascii-cube-T10 ascii-cube-T11 ascii-cube-T12))
@@ -423,7 +430,7 @@ C)
 ;;;; garbage collection
 ;; gc-elapsed
 ;; (setq garbage-collection-messages nil)
-(setq ascii-cube-new-window t)
+(setq ascii-cube-new-window nil)
 
 
               ;;                         ########
@@ -443,7 +450,7 @@ C)
               ;;     ........##############
               ;;     ..........######
 
-
+;; if ray through pixel collides with T and triangle-shade
 (defun ascii-cube-triangle-collision (T)
   (setq centr_z (aref (ascii-cube-triangle-centroid T) 2))
   (if (and (< centr_z ascii-cube-z_min)
@@ -451,6 +458,7 @@ C)
       (progn (setq ascii-cube-collision (ascii-cube-triangle-shade T))
              (setq ascii-cube-z_min centr_z))))
 
+;; draw frame
 (defun ascii-cube-draw-frame (object)
   (with-current-buffer "ascii-cube"
     (erase-buffer)
@@ -472,7 +480,7 @@ C)
       (beginning-of-buffer))
   (garbage-collect))
 
-
+;; animate
 (defun ascii-cube-animate ()
   (interactive)
   (ascii-cube-draw-frame ascii-cube)
@@ -480,6 +488,7 @@ C)
   (ascii-cube-rotate ascii-cube 1)
   )
 
+;; rotation animations
 (defun ascii-cube-animate-up ()
   (interactive)
   (ascii-cube-rotate ascii-cube 2) (ascii-cube-draw-frame ascii-cube))
@@ -500,13 +509,14 @@ C)
   (ascii-cube-rotate ascii-cube 5) (ascii-cube-draw-frame ascii-cube))
 ;; cube.el -------------------------------------
 
+;; close
 (defun ascii-cube-close ()
   (interactive)
   (if ascii-cube-new-window
       (kill-buffer-and-window)
     (kill-buffer "ascii-cube")))
 
-
+;; keymap
 (setq ascii-cube-keymap (make-sparse-keymap))
 (define-key ascii-cube-keymap "w" #'ascii-cube-animate-up)
 (define-key ascii-cube-keymap "s" #'ascii-cube-animate-down)
@@ -516,7 +526,7 @@ C)
 (define-key ascii-cube-keymap "e" #'ascii-cube-animate-right)
 (define-key ascii-cube-keymap "x" #'ascii-cube-close)
 
-
+;; old keymap
 ;; (setq ascii-cube-keymap (define-keymap
 ;;                      "w" #'ascii-cube-animate-up
 ;;                      "s" #'ascii-cube-animate-down
@@ -526,6 +536,7 @@ C)
 ;;                      "e" #'ascii-cube-animate-right
 ;;                      "x" #'kill-buffer-and-window))
 
+;; main
 (defun ascii-cube ()
   (interactive)
   ;; (kill-buffer "ascii-cube")
